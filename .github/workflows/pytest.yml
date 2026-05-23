@@ -20,6 +20,7 @@ jobs:
     env:
       GOREST_BASE_URL: https://gorest.co.in/public/v2
       GOREST_API_TOKEN: ${{ secrets.GOREST_API_TOKEN }}
+      GOREST_REQUEST_DELAY: "1"
 
     steps:
       - name: Check out repository

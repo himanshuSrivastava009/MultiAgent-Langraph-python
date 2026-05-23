@@ -1,6 +1,7 @@
 # gorest_api_tests/src/api_client/gorest_client.py
 import requests
 import time
+import os
 from requests import Response
 
 class GoRestClient:
@@ -22,6 +23,7 @@ class GoRestClient:
         self.token = token
         self.session = requests.Session() # Use a session for connection pooling and efficiency
         self.max_rate_limit_retries = 2
+        self.request_delay = float(os.getenv("GOREST_REQUEST_DELAY", "0"))
 
     def _get_headers(self, authenticated: bool = True) -> dict:
         """
@@ -35,7 +37,8 @@ class GoRestClient:
         """
         headers = {
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            "User-Agent": "gorest-pytest-suite/1.0 (+https://github.com/himanshuSrivastava009/MultiAgent-Langraph-python)"
         }
         if authenticated:
             headers["Authorization"] = f"Bearer {self.token}"
@@ -59,6 +62,9 @@ class GoRestClient:
 
         for attempt in range(self.max_rate_limit_retries + 1):
             try:
+                if self.request_delay:
+                    time.sleep(self.request_delay)
+
                 if payload:
                     response = self.session.request(method, url, json=payload, headers=headers)
                 else:
